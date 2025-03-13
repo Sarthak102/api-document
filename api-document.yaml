@@ -1,0 +1,1116 @@
+openapi: 3.0.0
+info:
+  title: Green Finance API Documentation
+  version: "1.0.0"
+  description: >
+    This document provides detailed API documentation for the Green Finance backend.
+    It covers endpoints for user authentication, project management, file uploads/downloads,
+    dashboard layouts and charts, company operations, and business rules.
+    All endpoints that require authentication use JWT tokens. For endpoints where data is required,
+    please refer to the provided schema and default values.
+servers:
+  - url: http://127.0.0.1:5000
+    description: Local development server
+components:
+  schemas:
+    UserLogin:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          default: "1234@example.com"
+          description: The registered email address of the user.
+        password:
+          type: string
+          default: "12345"
+          description: The password for the user account.
+    UserLoginResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          default: "Login successful"
+          description: A confirmation message indicating successful login.
+        token:
+          type: string
+          default: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0MTg2OTU2OCwianRpIjoiNjM4MWYzZWEtYWNhNi00YmIzLThhMWItOTllODU2ODNiNzA4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6InVzZXJfNCIsIm5iZiI6MTc0MTg2OTU2OCwiY3NyZiI6IjI4NmU1YzY1LTFkY2UtNDQ1Ni1hYmZkLWU5NDg5OTMwODZlMSIsImV4cCI6MTc0MTg3MTM2OH0.ITBWpF5hMX_ADQ_9rFgZUSzqum-otWAqwbDbdgHYHec"
+          description: The JWT token to be used for subsequent authenticated requests.
+    UserSignup:
+      type: object
+      required:
+        - name
+        - email
+        - password
+        - company_id
+        - contact
+        - designation
+      properties:
+        name:
+          type: string
+          default: "example12"
+          description: The full name of the new user.
+        email:
+          type: string
+          default: "1234@example.com"
+          description: The email address to register the user.
+        password:
+          type: string
+          default: "12345"
+          description: The password for the user account.
+        company_id:
+          type: number
+          default: 1
+          description: The identifier of the company the user belongs to.
+        contact:
+          type: string
+          default: "234567890"
+          description: The contact phone number of the user.
+        designation:
+          type: string
+          default: "HR"
+          description: The designation or role of the user.
+    PasswordUpdate:
+      type: object
+      required:
+        - current_password
+        - new_password
+      properties:
+        current_password:
+          type: string
+          default: "12345"
+          description: The current password of the user.
+        new_password:
+          type: string
+          default: "12"
+          description: The new password to update the account with.
+    UserSettings:
+      type: object
+      properties:
+        email:
+          type: string
+          default: "example12"
+          description: The email address associated with the settings.
+        display_name:
+          type: string
+          default: "1234@example.com"
+          description: The name displayed to the user.
+        notifications_enabled:
+          type: boolean
+          default: true
+          description: Flag to indicate if notifications are enabled.
+        theme_preference:
+          type: string
+          default: "light"
+          description: The user's theme preference (light or dark).
+    ChatRequest:
+      type: object
+      required:
+        - query
+        - project
+      properties:
+        query:
+          type: string
+          default: "What is the status of the project?"
+          description: The chat query to be processed.
+        project:
+          type: string
+          default: "example123"
+          description: The project identifier to contextualize the query.
+        analytics:
+          type: boolean
+          default: false
+          description: Optional flag to enable analytics on the chat query.
+    FileUpload:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+          description: The file to be uploaded.
+        project:
+          type: string
+          default: "1"
+          description: The project ID the file belongs to.
+        is_disclosure:
+          type: string
+          default: "false"
+          description: Flag to indicate if the file is a disclosure document.
+        is_update:
+          type: string
+          default: "false"
+          description: Flag to indicate if the file upload is an update to an existing file.
+    ProjectCreation:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          default: "example1234"
+          description: The name of the new project.
+    DashboardLayout:
+      type: object
+      required:
+        - name
+        - layout_data
+        - charts
+      properties:
+        name:
+          type: string
+          default: "Main Dashboard"
+          description: The name for the dashboard layout.
+        layout_data:
+          type: object
+          default:
+            lg:
+              - i: "chart1"
+                chartId: "1"
+                x: 0
+                y: 0
+                w: 4
+                h: 3
+          description: >
+            Layout data defining the position and size of each chart on the dashboard.
+            It uses breakpoints (e.g., "lg") to define the layout for different screen sizes.
+        charts:
+          type: array
+          default:
+            - name: "Monthly Sales"
+              query: "SELECT * FROM sales"
+              chart_data:
+                Name: "Sales Chart"
+                Type: "LineChart"
+                X_axis_label: "Months"
+                Y_axis_label: "Revenue"
+                X_axis_data:
+                  - "Jan"
+                  - "Feb"
+                  - "Mar"
+                Y_axis_data:
+                  - 100
+                  - 150
+                  - 200
+                labels:
+                  - "Product A"
+                  - "Product B"
+                  - "Product C"
+                Values:
+                  - 50
+                  - 75
+                  - 25
+                Column_headers:
+                  - "Product"
+                  - "Sales"
+                Row_data:
+                  - [ "Product A", "100" ]
+                  - [ "Product B", "150" ]
+                  - [ "Product C", "200" ]
+            - name: "Quarterly Growth"
+              query: "SELECT * FROM growth"
+              chart_data:
+                Name: "Growth Chart"
+                Type: "BarChart"
+                X_axis_label: "Quarters"
+                Y_axis_label: "Growth"
+                X_axis_data:
+                  - "Q1"
+                  - "Q2"
+                Y_axis_data:
+                  - 10
+                  - 15
+                labels:
+                  - "Q1"
+                  - "Q2"
+                Values:
+                  - 10
+                  - 15
+                Column_headers:
+                  - "Quarter"
+                  - "Growth"
+                Row_data:
+                  - [ "Q1", "10" ]
+                  - [ "Q2", "15" ]
+          description: >
+            A list of chart configurations associated with the dashboard layout.
+            Each chart configuration includes chart details, query, and the chart data.
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - BearerAuth: []
+paths:
+  /api/user/login:
+    post:
+      summary: User Login
+      description: >
+        Authenticate a user using email and password and return a JWT token.
+        Use this endpoint to log into the platform.
+      tags:
+        - User
+      requestBody:
+        description: User login details (application/json)
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+      responses:
+        '200':
+          description: Login successful, returns a JWT token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLoginResponse'
+        '401':
+          description: Invalid email or password.
+  /api/user/signup:
+    post:
+      summary: User Signup
+      description: >
+        Create a new user account. Ensure that the email is unique and that all required fields are provided.
+      tags:
+        - User
+      requestBody:
+        description: User signup details (application/json)
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserSignup'
+      responses:
+        '200':
+          description: User created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSignup'
+        '400':
+          description: Invalid input data.
+  /api/user/settings/password:
+    post:
+      summary: Update User Password
+      description: >
+        Attempt to update the user's password. Note that user password updates are currently not implemented.
+      tags:
+        - User
+      requestBody:
+        description: Current and new password (application/json)
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordUpdate'
+      responses:
+        '200':
+          description: Password updated successfully (for company users).
+        '400':
+          description: Invalid input data.
+        '501':
+          description: User password updates not implemented.
+    patch:
+      summary: Update User Password (Alternate Method)
+      description: Alternate method to update the user's password.
+      tags:
+        - User
+      requestBody:
+        description: Current and new password (application/json)
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordUpdate'
+      responses:
+        '200':
+          description: Password updated successfully (for company users).
+        '400':
+          description: Invalid input data.
+        '501':
+          description: User password updates not implemented.
+  /api/user/settings:
+    get:
+      summary: Get User Settings
+      description: Retrieve the current user settings. If no settings exist, default settings are created.
+      tags:
+        - User
+      responses:
+        '200':
+          description: User settings retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSettings'
+        '401':
+          description: Unauthorized.
+    patch:
+      summary: Update User Settings
+      description: >
+        Update user settings such as display name, notifications, and theme preference.
+        This endpoint accepts partial updates.
+      tags:
+        - User
+      requestBody:
+        description: User settings to update (application/json)
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserSettings'
+      responses:
+        '200':
+          description: User settings updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSettings'
+        '400':
+          description: Bad Request.
+  /api/user/payment:
+    get:
+      summary: Get Payment Information
+      description: Retrieve payment details for the user. (Functionality coming soon.)
+      tags:
+        - User
+      responses:
+        '200':
+          description: Payment information.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    default: "Payment functionality coming soon"
+                  last4:
+                    type: string
+                    default: "****"
+                  expiry_month:
+                    type: number
+                    default: null
+                  expiry_year:
+                    type: number
+                    default: null
+                  brand:
+                    type: string
+                    default: null
+  /api/user/logout:
+    post:
+      summary: Logout
+      description: Invalidate the current JWT token to log out the user.
+      tags:
+        - User
+      responses:
+        '200':
+          description: Logout successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    default: "Successfully logged out"
+        '500':
+          description: Logout failed.
+  /api/chat:
+    post:
+      summary: Send Chat Query
+      description: >
+        Submit a chat query related to a project and receive a response based on project documents.
+      tags:
+        - Chat
+      requestBody:
+        description: Chat query details (application/json)
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+      responses:
+        '200':
+          description: Chat response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  response:
+                    type: string
+                    default: >
+                      I couldn't find any relevant information in the project documents to answer your question. 
+                      Please try rephrasing your question or ensure that the relevant information has been uploaded to the project.
+                  sources:
+                    type: array
+                    items:
+                      type: string
+                    default: []
+  /api/upload:
+    post:
+      summary: Upload File
+      description: >
+        Upload a file (Excel or Disclosure) to a project. The file is processed and stored accordingly.
+      tags:
+        - File
+      requestBody:
+        description: File upload data (multipart/form-data)
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FileUpload'
+      responses:
+        '200':
+          description: File uploaded successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  file_type:
+                    type: string
+                    default: "excel"
+                  message:
+                    type: string
+                    default: "File uploaded and processed successfully"
+                  user_type:
+                    type: string
+                    default: "lender"
+  /api/projects/{project_id}/pl:
+    get:
+      summary: Get Project Profit & Loss
+      description: Retrieve the Profit and Loss data for a given project.
+      tags:
+        - Project
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          description: ID of the project
+          schema:
+            type: number
+            default: 1
+      responses:
+        '200':
+          description: Profit and Loss data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  netProfit:
+                    type: number
+                    default: 20000
+                  totalCost:
+                    type: number
+                    default: 30000
+                  totalRevenue:
+                    type: number
+                    default: 50000
+  /api/projects/{project_id}/files/{file_id}/download:
+    get:
+      summary: Download Project File
+      description: Download a specific file for a project.
+      tags:
+        - Project
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          description: ID of the project
+          schema:
+            type: number
+            default: 1
+        - name: file_id
+          in: path
+          required: true
+          description: ID of the file
+          schema:
+            type: number
+            default: 2
+      responses:
+        '200':
+          description: File downloaded successfully (binary stream).
+        '404':
+          description: File not found.
+  /api/projects/{project_id}/files:
+    get:
+      summary: Get Project Files
+      description: Retrieve all files associated with a project.
+      tags:
+        - Project
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          description: ID of the project
+          schema:
+            type: number
+            default: 1
+      responses:
+        '200':
+          description: List of project files.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    addedBy:
+                      type: string
+                      default: "TechM"
+                    dateAdded:
+                      type: string
+                      default: "2025-03-13 18:41:33"
+                    id:
+                      type: number
+                      default: 1
+                    lastUpdated:
+                      type: string
+                      default: "2025-03-13"
+                    name:
+                      type: string
+                      default: "TestProject_Quotation.xlsx"
+                    path:
+                      type: string
+                      default: "uploads\\TechM\\example123\\excel_documents\\TestProject_Quotation.xlsx"
+                    relative_path:
+                      type: string
+                      default: "excel_documents"
+                    size:
+                      type: number
+                      default: 10539
+  /api/projects/{project_id}/charts:
+    get:
+      summary: Get Project Charts
+      description: Retrieve all charts associated with a project.
+      tags:
+        - Project
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          description: ID of the project
+          schema:
+            type: number
+            default: 1
+      responses:
+        '200':
+          description: List of charts.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+  /api/projects/{project_id}/dashboard/charts/{chart_id}:
+    post:
+      summary: Add Chart to Dashboard
+      description: Add an existing chart to the project dashboard layout.
+      tags:
+        - Dashboard
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          description: ID of the project
+          schema:
+            type: number
+            default: 1
+        - name: chart_id
+          in: path
+          required: true
+          description: ID of the chart
+          schema:
+            type: number
+            default: 1
+      responses:
+        '200':
+          description: Chart added successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    default: "Chart added"
+        '404':
+          description: Chart not found or doesn't belong to project.
+    delete:
+      summary: Remove Chart from Dashboard
+      description: Remove a chart from the project dashboard layout.
+      tags:
+        - Dashboard
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          description: ID of the project
+          schema:
+            type: number
+            default: 1
+        - name: chart_id
+          in: path
+          required: true
+          description: ID of the chart
+          schema:
+            type: number
+            default: 1
+      responses:
+        '200':
+          description: Chart removed successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    default: "Chart removed"
+        '404':
+          description: Chart not found or doesn't belong to project.
+  /api/projects/{project_id}/dashboard/charts:
+    get:
+      summary: Get Pinned Dashboard Charts
+      description: Retrieve pinned charts on the project dashboard.
+      tags:
+        - Dashboard
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          description: ID of the project
+          schema:
+            type: number
+            default: 1
+      responses:
+        '200':
+          description: List of pinned dashboard charts.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+  /api/projects/{project_id}/dashboard/layouts/{layout_id}:
+    get:
+      summary: Load Dashboard Layout
+      description: Retrieve a specific dashboard layout for a project.
+      tags:
+        - Dashboard
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          description: ID of the project
+          schema:
+            type: number
+            default: 1
+        - name: layout_id
+          in: path
+          required: true
+          description: ID of the dashboard layout
+          schema:
+            type: number
+            default: 4
+      responses:
+        '200':
+          description: Dashboard layout details.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    default: 4
+                  name:
+                    type: string
+                    default: "Main Dashboard"
+                  project_id:
+                    type: number
+                    default: 1
+                  layout_data:
+                    type: object
+                    default: {}
+                  charts:
+                    type: array
+                    default: []
+        '404':
+          description: Layout not found.
+  /api/projects/{project_id}/dashboard/layouts:
+    post:
+      summary: Save Dashboard Layout
+      description: >
+        Save a new dashboard layout configuration for a project. The layout must include a valid structure and reference existing chart IDs.
+      tags:
+        - Dashboard
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          description: ID of the project
+          schema:
+            type: number
+            default: 1
+      requestBody:
+        description: Dashboard layout configuration (application/json)
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DashboardLayout'
+      responses:
+        '201':
+          description: Dashboard layout saved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    default: "Dashboard layout saved successfully"
+                  id:
+                    type: number
+                    default: 4
+        '500':
+          description: Failed to save dashboard layout.
+    get:
+      summary: Get Dashboard Layouts
+      description: Retrieve all dashboard layouts for a project.
+      tags:
+        - Dashboard
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          description: ID of the project
+          schema:
+            type: number
+            default: 1
+      responses:
+        '200':
+          description: List of dashboard layouts.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                      default: 4
+                    name:
+                      type: string
+                      default: "Main Dashboard"
+                    project_id:
+                      type: number
+                      default: 1
+                    layout_data:
+                      type: object
+                      default: {}
+                    charts:
+                      type: array
+                      default: []
+  /api/projects/{project_id}:
+    get:
+      summary: Get Project Details
+      description: Retrieve detailed information about a specific project.
+      tags:
+        - Project
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          description: ID of the project
+          schema:
+            type: number
+            default: 1
+      responses:
+        '200':
+          description: Project details.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    default: 1
+                  name:
+                    type: string
+                    default: "example123"
+                  company_id:
+                    type: number
+                    default: 1
+                  description:
+                    type: string
+                    default: ""
+                  created_at:
+                    type: string
+                    default: ""
+                  updated_at:
+                    type: string
+                    default: ""
+  /api/projects:
+    get:
+      summary: Get Projects
+      description: Retrieve a list of all projects.
+      tags:
+        - Project
+      responses:
+        '200':
+          description: List of projects.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                      default: 1
+                    name:
+                      type: string
+                      default: "example123"
+    post:
+      summary: Create Project
+      description: Create a new project.
+      tags:
+        - Project
+      requestBody:
+        description: Project creation details (application/json)
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectCreation'
+      responses:
+        '200':
+          description: Project created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    default: 2
+                  message:
+                    type: string
+                    default: "Project created successfully"
+  /api/company/login:
+    post:
+      summary: Company Login
+      description: Authenticate a company user and return a JWT token along with user type.
+      tags:
+        - Company
+      requestBody:
+        description: Company login credentials (application/json)
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  default: "123@example.com"
+                password:
+                  type: string
+                  default: "1234"
+      responses:
+        '200':
+          description: Login successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    default: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  userType:
+                    type: string
+                    default: "lender"
+  /api/company/signup:
+    post:
+      summary: Company Signup
+      description: Register a new company account.
+      tags:
+        - Company
+      requestBody:
+        description: Company signup details (application/json)
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - password
+                - userType
+              properties:
+                name:
+                  type: string
+                  default: "Lender"
+                email:
+                  type: string
+                  default: "1234@example.com"
+                password:
+                  type: string
+                  default: "1234"
+                userType:
+                  type: string
+                  enum:
+                    - borrower
+                    - lender
+                  default: "lender"
+      responses:
+        '200':
+          description: Company created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    default: 2
+                  message:
+                    type: string
+                    default: "Company created successfully"
+  /api/company/users:
+    post:
+      summary: Add Company User
+      description: Add a new user under a company account.
+      tags:
+        - Company
+      requestBody:
+        description: Company user details (application/json)
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - password
+                - contact
+                - designation
+              properties:
+                name:
+                  type: string
+                  default: "example"
+                email:
+                  type: string
+                  default: "1234@example.com"
+                password:
+                  type: string
+                  default: "12345"
+                contact:
+                  type: string
+                  default: "7487678908"
+                designation:
+                  type: string
+                  default: "HR"
+      responses:
+        '200':
+          description: Company user added successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    default: "User added Successfully"
+  /api/companies:
+    get:
+      summary: Get Companies
+      description: Retrieve a list of companies.
+      tags:
+        - Company
+      responses:
+        '200':
+          description: List of companies.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                      default: 1
+                    name:
+                      type: string
+                      default: "TechM"
+  /api/business-rules/templates:
+    get:
+      summary: Get Business Rules Templates
+      description: Retrieve a list of business rules template files.
+      tags:
+        - Business Rules
+      responses:
+        '200':
+          description: List of business rules files.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  files:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          default: "[B] Lender- Green Loan Template_Energy Sector_ v1.0.xlsm"
+                        path:
+                          type: string
+                          default: "D:\\GreenFinance\\GF-Supabase-backend\\templates\\Sector-wise Lender Business Rules\\[B] Lender- Green Loan Template_Energy Sector_ v1.0.xlsm"
+  /api/business-rules/upload:
+    post:
+      summary: Upload Business Rules File
+      description: Upload a new business rules file (for lenders).
+      tags:
+        - Business Rules
+      requestBody:
+        description: File upload data (multipart/form-data)
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Business rules file uploaded successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    default: "Business rules uploaded successfully"
