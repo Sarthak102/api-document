@@ -36,7 +36,7 @@ components:
           description: A confirmation message indicating successful login.
         token:
           type: string
-          default: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0MTg2OTU2OCwianRpIjoiNjM4MWYzZWEtYWNhNi00YmIzLThhMWItOTllODU2ODNiNzA4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6InVzZXJfNCIsIm5iZiI6MTc0MTg2OTU2OCwiY3NyZiI6IjI4NmU1YzY1LTFkY2UtNDQ1Ni1hYmZkLWU5NDg5OTMwODZlMSIsImV4cCI6MTc0MTg3MTM2OH0.ITBWpF5hMX_ADQ_9rFgZUSzqum-otWAqwbDbdgHYHec"
+          default: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
           description: The JWT token to be used for subsequent authenticated requests.
     UserSignup:
       type: object
@@ -266,6 +266,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserLoginResponse'
+              example:
+                message: "Login successful"
+                token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
         '401':
           description: Invalid email or password.
   /api/user/signup:
@@ -288,7 +291,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserSignup'
+                type: object
+              example:
+                id: "3"
+                message: "User created successfully"
         '400':
           description: Invalid input data.
   /api/user/settings/password:
@@ -308,6 +314,12 @@ paths:
       responses:
         '200':
           description: Password updated successfully (for company users).
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                message: "Password updated successfully"
         '400':
           description: Invalid input data.
         '501':
@@ -327,6 +339,12 @@ paths:
       responses:
         '200':
           description: Password updated successfully (for company users).
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                message: "Password updated successfully"
         '400':
           description: Invalid input data.
         '501':
@@ -344,6 +362,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserSettings'
+              example:
+                email: "example12"
+                display_name: "1234@example.com"
+                notifications_enabled: true
+                theme_preference: "light"
         '401':
           description: Unauthorized.
     patch:
@@ -367,6 +390,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserSettings'
+              example:
+                email: "example12"
+                display_name: "1234@example.com"
+                notifications_enabled: true
+                theme_preference: "light"
         '400':
           description: Bad Request.
   /api/user/payment:
@@ -382,22 +410,12 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  message:
-                    type: string
-                    default: "Payment functionality coming soon"
-                  last4:
-                    type: string
-                    default: "****"
-                  expiry_month:
-                    type: number
-                    default: null
-                  expiry_year:
-                    type: number
-                    default: null
-                  brand:
-                    type: string
-                    default: null
+              example:
+                message: "Payment functionality coming soon"
+                last4: "****"
+                expiry_month: null
+                expiry_year: null
+                brand: null
   /api/user/logout:
     post:
       summary: Logout
@@ -411,10 +429,8 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  message:
-                    type: string
-                    default: "Successfully logged out"
+              example:
+                message: "Successfully logged out"
         '500':
           description: Logout failed.
   /api/chat:
@@ -438,17 +454,9 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  response:
-                    type: string
-                    default: >
-                      I couldn't find any relevant information in the project documents to answer your question. 
-                      Please try rephrasing your question or ensure that the relevant information has been uploaded to the project.
-                  sources:
-                    type: array
-                    items:
-                      type: string
-                    default: []
+              example:
+                response: "I couldn't find any relevant information in the project documents to answer your question. Please try rephrasing your question or ensure that the relevant information has been uploaded to the project."
+                sources: []
   /api/upload:
     post:
       summary: Upload File
@@ -470,16 +478,10 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  file_type:
-                    type: string
-                    default: "excel"
-                  message:
-                    type: string
-                    default: "File uploaded and processed successfully"
-                  user_type:
-                    type: string
-                    default: "lender"
+              example:
+                file_type: "excel"
+                message: "File uploaded and processed successfully"
+                user_type: "lender"
   /api/projects/{project_id}/pl:
     get:
       summary: Get Project Profit & Loss
@@ -501,16 +503,10 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  netProfit:
-                    type: number
-                    default: 20000
-                  totalCost:
-                    type: number
-                    default: 30000
-                  totalRevenue:
-                    type: number
-                    default: 50000
+              example:
+                netProfit: 20000
+                totalCost: 30000
+                totalRevenue: 50000
   /api/projects/{project_id}/files/{file_id}/download:
     get:
       summary: Download Project File
@@ -558,33 +554,56 @@ paths:
             application/json:
               schema:
                 type: array
-                items:
-                  type: object
-                  properties:
-                    addedBy:
-                      type: string
-                      default: "TechM"
-                    dateAdded:
-                      type: string
-                      default: "2025-03-13 18:41:33"
-                    id:
-                      type: number
-                      default: 1
-                    lastUpdated:
-                      type: string
-                      default: "2025-03-13"
-                    name:
-                      type: string
-                      default: "TestProject_Quotation.xlsx"
-                    path:
-                      type: string
-                      default: "uploads\\TechM\\example123\\excel_documents\\TestProject_Quotation.xlsx"
-                    relative_path:
-                      type: string
-                      default: "excel_documents"
-                    size:
-                      type: number
-                      default: 10539
+              example:
+                - addedBy: "TechM"
+                  dateAdded: "2025-03-13 18:41:33"
+                  id: 1
+                  lastUpdated: "2025-03-13"
+                  name: "TestProject_Quotation.xlsx"
+                  path: "uploads\\TechM\\example123\\excel_documents\\TestProject_Quotation.xlsx"
+                  relative_path: "excel_documents"
+                  size: 10539
+  /api/projects/{project_id}/files/{file_id}:
+    delete:
+      summary: Delete Project File
+      description: >
+        Delete a specific file for a project.
+        The endpoint accepts an optional query parameter "fileType" (default: "excel").
+      tags:
+        - Project
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          description: ID of the project
+          schema:
+            type: number
+            default: 1
+        - name: file_id
+          in: path
+          required: true
+          description: ID of the file
+          schema:
+            type: number
+            default: 2
+        - name: fileType
+          in: query
+          required: false
+          description: "The type of file to delete (default: \"excel\")"
+          schema:
+            type: string
+            default: "excel"
+      responses:
+        '200':
+          description: File deleted successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                message: "File deleted successfully"
+        '404':
+          description: File not found.
   /api/projects/{project_id}/charts:
     get:
       summary: Get Project Charts
@@ -606,8 +625,13 @@ paths:
             application/json:
               schema:
                 type: array
-                items:
-                  type: object
+              example:
+                - chartId: 1
+                  name: "Monthly Sales"
+                  type: "LineChart"
+                - chartId: 2
+                  name: "Quarterly Growth"
+                  type: "BarChart"
   /api/projects/{project_id}/dashboard/charts/{chart_id}:
     post:
       summary: Add Chart to Dashboard
@@ -636,10 +660,8 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  message:
-                    type: string
-                    default: "Chart added"
+              example:
+                message: "Chart added"
         '404':
           description: Chart not found or doesn't belong to project.
     delete:
@@ -669,16 +691,14 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  message:
-                    type: string
-                    default: "Chart removed"
+              example:
+                message: "Chart removed"
         '404':
           description: Chart not found or doesn't belong to project.
   /api/projects/{project_id}/dashboard/charts:
     get:
       summary: Get Pinned Dashboard Charts
-      description: Retrieve pinned charts on the project dashboard.
+      description: Retrieve the list of charts currently pinned on the project dashboard.
       tags:
         - Dashboard
       parameters:
@@ -696,12 +716,17 @@ paths:
             application/json:
               schema:
                 type: array
-                items:
-                  type: object
+              example:
+                - chartId: 1
+                  name: "Monthly Sales"
+                  type: "LineChart"
+                - chartId: 2
+                  name: "Quarterly Growth"
+                  type: "BarChart"
   /api/projects/{project_id}/dashboard/layouts/{layout_id}:
     get:
       summary: Load Dashboard Layout
-      description: Retrieve a specific dashboard layout for a project.
+      description: Retrieve details of a specific dashboard layout for a project.
       tags:
         - Dashboard
       parameters:
@@ -726,22 +751,12 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  id:
-                    type: number
-                    default: 4
-                  name:
-                    type: string
-                    default: "Main Dashboard"
-                  project_id:
-                    type: number
-                    default: 1
-                  layout_data:
-                    type: object
-                    default: {}
-                  charts:
-                    type: array
-                    default: []
+              example:
+                id: 4
+                name: "Main Dashboard"
+                project_id: 1
+                layout_data: {}
+                charts: []
         '404':
           description: Layout not found.
   /api/projects/{project_id}/dashboard/layouts:
@@ -773,13 +788,9 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  message:
-                    type: string
-                    default: "Dashboard layout saved successfully"
-                  id:
-                    type: number
-                    default: 4
+              example:
+                message: "Dashboard layout saved successfully"
+                id: 4
         '500':
           description: Failed to save dashboard layout.
     get:
@@ -802,24 +813,12 @@ paths:
             application/json:
               schema:
                 type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: number
-                      default: 4
-                    name:
-                      type: string
-                      default: "Main Dashboard"
-                    project_id:
-                      type: number
-                      default: 1
-                    layout_data:
-                      type: object
-                      default: {}
-                    charts:
-                      type: array
-                      default: []
+              example:
+                - id: 4
+                  name: "Main Dashboard"
+                  project_id: 1
+                  layout_data: {}
+                  charts: []
   /api/projects/{project_id}:
     get:
       summary: Get Project Details
@@ -841,25 +840,13 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  id:
-                    type: number
-                    default: 1
-                  name:
-                    type: string
-                    default: "example123"
-                  company_id:
-                    type: number
-                    default: 1
-                  description:
-                    type: string
-                    default: ""
-                  created_at:
-                    type: string
-                    default: ""
-                  updated_at:
-                    type: string
-                    default: ""
+              example:
+                id: 1
+                name: "example123"
+                company_id: 1
+                description: ""
+                created_at: ""
+                updated_at: ""
   /api/projects:
     get:
       summary: Get Projects
@@ -873,15 +860,9 @@ paths:
             application/json:
               schema:
                 type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: number
-                      default: 1
-                    name:
-                      type: string
-                      default: "example123"
+              example:
+                - id: 1
+                  name: "example123"
     post:
       summary: Create Project
       description: Create a new project.
@@ -901,13 +882,9 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  id:
-                    type: number
-                    default: 2
-                  message:
-                    type: string
-                    default: "Project created successfully"
+              example:
+                id: "2"
+                message: "Project created successfully"
   /api/company/login:
     post:
       summary: Company Login
@@ -938,13 +915,9 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  token:
-                    type: string
-                    default: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                  userType:
-                    type: string
-                    default: "lender"
+              example:
+                token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                userType: "lender"
   /api/company/signup:
     post:
       summary: Company Signup
@@ -986,17 +959,13 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  id:
-                    type: number
-                    default: 2
-                  message:
-                    type: string
-                    default: "Company created successfully"
+              example:
+                id: "2"
+                message: "Company created successfully"
   /api/company/users:
     post:
       summary: Add Company User
-      description: Add a new user under a company account.
+      description: Add a new user under an existing company account.
       tags:
         - Company
       requestBody:
@@ -1035,10 +1004,8 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  message:
-                    type: string
-                    default: "User added Successfully"
+              example:
+                message: "User added Successfully"
   /api/companies:
     get:
       summary: Get Companies
@@ -1052,19 +1019,13 @@ paths:
             application/json:
               schema:
                 type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: number
-                      default: 1
-                    name:
-                      type: string
-                      default: "TechM"
+              example:
+                - id: 1
+                  name: "TechM"
   /api/business-rules/templates:
     get:
       summary: Get Business Rules Templates
-      description: Retrieve a list of business rules template files.
+      description: Retrieve a list of business rules template files available for lenders.
       tags:
         - Business Rules
       responses:
@@ -1074,18 +1035,10 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  files:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        name:
-                          type: string
-                          default: "[B] Lender- Green Loan Template_Energy Sector_ v1.0.xlsm"
-                        path:
-                          type: string
-                          default: "D:\\GreenFinance\\GF-Supabase-backend\\templates\\Sector-wise Lender Business Rules\\[B] Lender- Green Loan Template_Energy Sector_ v1.0.xlsm"
+              example:
+                files:
+                  - name: "[B] Lender- Green Loan Template_Energy Sector_ v1.0.xlsm"
+                    path: "D:\\GreenFinance\\GF-Supabase-backend\\templates\\Sector-wise Lender Business Rules\\[B] Lender- Green Loan Template_Energy Sector_ v1.0.xlsm"
   /api/business-rules/upload:
     post:
       summary: Upload Business Rules File
@@ -1110,7 +1063,5 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  message:
-                    type: string
-                    default: "Business rules uploaded successfully"
+              example:
+                message: "Business rules uploaded successfully"
